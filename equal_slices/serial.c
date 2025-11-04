@@ -7,7 +7,7 @@
 #include <zlib.h>
  
 #define BUFFER_SIZE 1048576 // 1MB
-#define NUM_THREADS 2
+#define NUM_THREADS 19
 
 int cmp(const void *a, const void *b) {
 	return strcmp(*(char **) a, *(char **) b);
@@ -48,7 +48,6 @@ void* compress_slice(void* thread_args){
 		if(index >= num_files){
 			break;
 		}
-		printf("%i\n", index);
 
 		// build the file path
 		int len = strlen(directory_name)+strlen(files[index])+2;
@@ -134,7 +133,7 @@ int compress_directory(char *directory_name) {
 	// shared array of finished files for all the threads to write to
 	compressed_file* finished_files = calloc(nfiles, sizeof(compressed_file));
 
-	int slice_size = (nfiles) / NUM_THREADS;
+	int slice_size = (nfiles + NUM_THREADS - 1) / NUM_THREADS;
 	for(int i = 0; i < NUM_THREADS; i++){
 
 		// pack thread arguments
