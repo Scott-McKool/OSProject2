@@ -15,7 +15,8 @@ int cmp(const void *a, const void *b) {
 
 // struct to represent a compressed file in memory
 typedef struct {
-	int 	size; // size of data
+	int 	compressed_size; // size of data after compresion
+	int 	original_size; // the size before compression
 	char* 	data; // ptr to char array of data
 } compressed_file;
 
@@ -79,8 +80,9 @@ void* compress_slice(void* thread_args){
 		
 		// write zipped data to results
 		// no critical section needed as each thread only writes to the index it already got.
+		finished_files[index].original_size = nbytes;
 		int nbytes_zipped = BUFFER_SIZE-strm.avail_out;
-		finished_files[index].size = nbytes_zipped;
+		finished_files[index].compressed_size = nbytes_zipped;
 		finished_files[index].data = malloc(nbytes_zipped);
 		memcpy(finished_files[index].data, buffer_out, nbytes_zipped);	
 
@@ -155,8 +157,10 @@ int compress_directory(char *directory_name) {
 
 	// write all the data from finished_files to the outfile
 	for(int i = 0; i < nfiles; i++){
-		fwrite(&finished_files[i].size, sizeof(int), 1, f_out);
-		fwrite(finished_files[i].data, sizeof(char), finished_files[i].size, f_out);
+		fwrite(&finished_files[i].compressed_size, sizeof(int), 1, f_out);
+		fwrite(finished_files[i].data, sizeof(char), finished_files[i].compressed_size, f_out);
+		total_in = total_in + finished_files[i].original_size;
+		total_out = total_out + finished_files[i].compressed_size;
 		free(finished_files[i].data);
 	}
 	fclose(f_out);
