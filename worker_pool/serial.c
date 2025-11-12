@@ -1,3 +1,10 @@
+// This approach works by creating NUM_THREADS worker threads, that each have access
+// to the list of files to be compressed and the index of the next file to be compressed.
+// Each thread takes the next file from files, compresses it, then looks back at the array for another,
+// this repeats forever untill all the files are compressed. 
+// all the threads write the data to the finished_files array so that the main thread can write the 
+// compressed data to the output file in the correct order.
+
 #include <pthread.h>
 #include <dirent.h> 
 #include <assert.h>
@@ -16,8 +23,8 @@ int cmp(const void *a, const void *b) {
 // struct to represent a compressed file in memory
 typedef struct {
 	int 	compressed_size; // size of data after compresion
-	int 	original_size; // the size before compression
-	char* 	data; // ptr to char array of data
+	int 	original_size; 	 // the size before compression
+	char* 	data; 			 // ptr to char array of data
 } compressed_file;
 
 // struct to hold arguments for worker threads

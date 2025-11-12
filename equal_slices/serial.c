@@ -16,8 +16,8 @@ int cmp(const void *a, const void *b) {
 // struct to represent a compressed file in memory
 typedef struct {
 	int 	compressed_size; // size of data after compresion
-	int 	original_size; // the size before compression
-	char* 	data; // ptr to char array of data
+	int 	original_size; 	 // the size before compression
+	char* 	data; 			 // ptr to char array of data
 } compressed_file;
 
 // struct to hold arguments for worker threads
